@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: ${MODE:-development}
+      args:
+        - SSH_PUB_KEY=${SSH_PUB_KEY}
+        - USER_UID=${USER_UID:-1000}
+        - USER_GID=${USER_GID:-1000}
+    container_name: blog-publisher-${MODE:-development}
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+      - "2222:22"
+    volumes:
+      - .:/home/devuser/app
+      - blog-data:/home/devuser/app/instance
+    environment:
+      - FLASK_ENV=${MODE:-development}
+      - MODE=${MODE:-development}
+    command: ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
+
+volumes:
+  blog-data:

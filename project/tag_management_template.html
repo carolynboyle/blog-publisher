@@ -1,0 +1,287 @@
+<!-- templates/manage_tags.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-tags"></i> Tags</h4>
+                <button class="btn btn-primary btn-sm" onclick="showAddTagModal()">
+                    <i class="fas fa-plus"></i> Add Tag
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="tag-search" placeholder="Search tags...">
+                </div>
+                
+                <div id="tags-list">
+                    {% for tag in tags %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded tag-item">
+                            <div>
+                                <strong>{{ tag.name }}</strong>
+                                <span class="badge bg-secondary ms-2">{{ tag.usage_count }} uses</span>
+                                {% if tag.description %}
+                                    <br><small class="text-muted">{{ tag.description }}</small>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTag({{ tag.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4><i class="fas fa-folder"></i> Categories</h4>
+                <button class="btn btn-primary btn-sm" onclick="showAddCategoryModal()">
+                    <i class="fas fa-plus"></i> Add Category
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="category-search" placeholder="Search categories...">
+                </div>
+                
+                <div id="categories-list">
+                    {% for category in categories %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border rounded category-item">
+                            <div>
+                                <strong>{{ category.name }}</strong>
+                                <span class="badge bg-secondary ms-2">{{ category.usage_count }} uses</span>
+                                {% if category.description %}
+                                    <br><small class="text-muted">{{ category.description }}</small>
+                                {% endif %}
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory({{ category.id }})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="fas fa-upload"></i> Bulk Import</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Import Tags</h5>
+                        <textarea class="form-control mb-2" id="bulk-tags" rows="4" 
+                                  placeholder="Enter tags separated by commas or new lines..."></textarea>
+                        <button class="btn btn-secondary" onclick="bulkImportTags()">
+                            <i class="fas fa-upload"></i> Import Tags
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Import Categories</h5>
+                        <textarea class="form-control mb-2" id="bulk-categories" rows="4" 
+                                  placeholder="Enter categories separated by commas or new lines..."></textarea>
+                        <button class="btn btn-secondary" onclick="bulkImportCategories()">
+                            <i class="fas fa-upload"></i> Import Categories
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Tag Modal -->
+<div class="modal fade" id="addTagModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Tag</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="tag-name" class="form-label">Tag Name</label>
+                    <input type="text" class="form-control" id="tag-name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="tag-description" class="form-label">Description (optional)</label>
+                    <input type="text" class="form-control" id="tag-description">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addTag()">Add Tag</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="category-name" class="form-label">Category Name</label>
+                    <input type="text" class="form-control" id="category-name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category-description" class="form-label">Description (optional)</label>
+                    <input type="text" class="form-control" id="category-description">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addCategory()">Add Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAddTagModal() {
+    document.getElementById('tag-name').value = '';
+    document.getElementById('tag-description').value = '';
+    new bootstrap.Modal(document.getElementById('addTagModal')).show();
+}
+
+function showAddCategoryModal() {
+    document.getElementById('category-name').value = '';
+    document.getElementById('category-description').value = '';
+    new bootstrap.Modal(document.getElementById('addCategoryModal')).show();
+}
+
+function addTag() {
+    const name = document.getElementById('tag-name').value.trim();
+    const description = document.getElementById('tag-description').value.trim();
+    
+    if (!name) {
+        alert('Tag name is required');
+        return;
+    }
+    
+    fetch('/add_tag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, description: description })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+function addCategory() {
+    const name = document.getElementById('category-name').value.trim();
+    const description = document.getElementById('category-description').value.trim();
+    
+    if (!name) {
+        alert('Category name is required');
+        return;
+    }
+    
+    fetch('/add_category', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, description: description })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + data.error);
+        }
+    });
+}
+
+function deleteTag(tagId) {
+    if (confirm('Are you sure you want to delete this tag?')) {
+        fetch(`/delete_tag/${tagId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function deleteCategory(categoryId) {
+    if (confirm('Are you sure you want to delete this category?')) {
+        fetch(`/delete_category/${categoryId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function bulkImportTags() {
+    const text = document.getElementById('bulk-tags').value;
+    const tags = text.split(/[,\n]/).map(tag => tag.trim()).filter(tag => tag);
+    
+    Promise.all(tags.map(tag => 
+        fetch('/add_tag', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: tag })
+        })
+    )).then(() => {
+        location.reload();
+    });
+}
+
+function bulkImportCategories() {
+    const text = document.getElementById('bulk-categories').value;
+    const categories = text.split(/[,\n]/).map(cat => cat.trim()).filter(cat => cat);
+    
+    Promise.all(categories.map(category => 
+        fetch('/add_category', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: category })
+        })
+    )).then(() => {
+        location.reload();
+    });
+}
+
+// Search functionality
+document.getElementById('tag-search').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    document.querySelectorAll('.tag-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+});
+
+document.getElementById('category-search').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    document.querySelectorAll('.category-item').forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,284 @@
+# Complete Directory Structure
+
+blog-publisher/
+├── README.md                          # Project documentation
+├── requirements.txt                   # Python dependencies
+├── setup.py                          # Package installation script
+├── MANIFEST.in                       # Package manifest for including files
+├── run.py                            # Development entry point
+├── .gitignore                        # Git ignore rules
+├── LICENSE                           # MIT License file
+│
+├── blog_publisher/                   # Main package directory
+│   ├── __init__.py                   # Package initialization and version
+│   ├── app.py                        # Flask app factory
+│   ├── config.py                     # Configuration classes
+│   ├── models.py                     # Database models
+│   ├── cli.py                        # Command line interface
+│   ├── utils.py                      # Utility functions
+│   │
+│   ├── api/                          # API clients
+│   │   ├── __init__.py
+│   │   ├── publishers.py             # Main publishing API
+│   │   ├── blogger.py                # Blogger-specific API
+│   │   └── wordpress.py              # WordPress-specific API
+│   │
+│   ├── routes/                       # Flask blueprints
+│   │   ├── __init__.py
+│   │   ├── main.py                   # Main routes (index, setup, settings)
+│   │   ├── posts.py                  # Post-related routes
+│   │   ├── tags.py                   # Tag management routes
+│   │   └── api.py                    # API endpoints
+│   │
+│   ├── templates/                    # Jinja2 templates
+│   │   ├── base.html                 # Base template with navigation
+│   │   ├── index.html                # Post dashboard
+│   │   ├── setup.html                # Initial setup wizard
+│   │   ├── settings.html             # Settings page
+│   │   ├── editor.html               # Rich text post editor
+│   │   └── manage_tags.html          # Tag management interface
+│   │
+│   └── static/                       # Static files (future use)
+│       ├── css/
+│       ├── js/
+│       └── images/
+│
+├── tests/                            # Test files
+│   ├── __init__.py
+│   ├── test_models.py               # Model tests
+│   ├── test_routes.py               # Route tests
+│   └── test_api.py                  # API tests
+│
+├── instance/                         # Instance-specific files (created at runtime)
+│   ├── blog_publisher.db            # SQLite database
+│   └── config.py                    # Instance-specific configuration
+│
+└── docs/                            # Documentation (optional)
+    ├── installation.md
+    ├── configuration.md
+    └── api.md
+
+# .gitignore
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Instance folder
+instance/
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Backup files
+backup_*.json
+
+# Installation Guide
+
+## Quick Installation (Development)
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/carolynboyle/blog-publisher.git
+cd blog-publisher
+```
+
+2. **Create a virtual environment:**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. **Install in development mode:**
+```bash
+pip install -e .
+```
+
+4. **Run the application:**
+```bash
+python run.py
+# OR
+blog-publisher
+```
+
+## Package Installation (Production)
+
+1. **Install from source:**
+```bash
+pip install git+https://github.com/carolynboyle/blog-publisher.git
+```
+
+2. **Run the application:**
+```bash
+blog-publisher --host 0.0.0.0 --port 8080 --config production
+```
+
+## Docker Installation
+
+1. **Create Dockerfile:**
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application
+COPY . .
+RUN pip install -e .
+
+# Create instance directory
+RUN mkdir -p instance
+
+# Expose port
+EXPOSE 5000
+
+# Run application
+CMD ["blog-publisher", "--host", "0.0.0.0", "--port", "5000"]
+```
+
+2. **Build and run:**
+```bash
+docker build -t blog-publisher .
+docker run -p 5000:5000 -v $(pwd)/instance:/app/instance blog-publisher
+```
+
+## Environment Variables
+
+```bash
+# Flask configuration
+FLASK_ENV=development|production|testing
+SECRET_KEY=your-secret-key-here
+DATABASE_URL=sqlite:///path/to/database.db
+
+# Server configuration
+HOST=127.0.0.1
+PORT=5000
+DEBUG=True
+
+# Blog platform credentials (optional - can be set via UI)
+WORDPRESS_URL=https://yourblog.com
+WORDPRESS_USERNAME=your-username
+WORDPRESS_PASSWORD=your-password
+
+BLOGGER_CLIENT_ID=your-client-id
+BLOGGER_CLIENT_SECRET=your-client-secret
+BLOGGER_BLOG_ID=your-blog-id
+```
+
+## Development Setup
+
+1. **Install development dependencies:**
+```bash
+pip install -e ".[dev]"  # If you add dev dependencies to setup.py
+```
+
+2. **Run tests:**
+```bash
+python -m pytest tests/
+```
+
+3. **Run with auto-reload:**
+```bash
+python run.py  # Automatically reloads on file changes
+```
+
+## Package Commands
+
+After installation, you can use these commands:
+
+```bash
+# Start the application
+blog-publisher
+
+# Start with custom settings
+blog-publisher --host 0.0.0.0 --port 8080 --config production
+
+# Get help
+blog-publisher --help
+```
+
+## File Locations
+
+- **Configuration:** `instance/config.py` (created automatically)
+- **Database:** `instance/blog_publisher.db` (SQLite)
+- **Logs:** `instance/logs/` (if logging to file)
+- **Backups:** Created in current directory or specified path
+
+## Upgrading
+
+```bash
+# If installed from git
+pip install --upgrade git+https://github.com/carolynboyle/blog-publisher.git
+
+# If installed from local source
+cd blog-publisher
+git pull
+pip install -e .
+```
+
+## Troubleshooting
+
+**Import errors:**
+- Make sure you're in the correct virtual environment
+- Reinstall with `pip install -e .`
+
+**Database errors:**
+- Delete `instance/blog_publisher.db` to reset
+- Check file permissions on the instance directory
+
+**Port already in use:**
+- Use a different port: `blog-publisher --port 8080`
+- Kill the process using the port: `lsof -ti:5000 | xargs kill`
+
+**Template not found:**
+- Reinstall the package: `pip install -e .`
+- Check that templates are included in MANIFEST.in
